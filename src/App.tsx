@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.module.css';
 import Container from './components/Container';
 import FilterContacts from './components/FilterContacts';
@@ -11,68 +11,55 @@ export type ContactType = {
   id: string;
 };
 
-type AppState = {
-  contacts: ContactType[];
-  filter: string;
-};
+export default function App() {
+  let [contacts, setContacts] = useState(() => {
+    return JSON.parse(localStorage.getItem('contacts')!) ?? [];
+  });
 
-class App extends Component<{}, AppState> {
-  state: AppState = {
-    contacts: [],
-    filter: '',
-  };
+  let [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    let storedContacts = localStorage.getItem('contacts');
-
+  useEffect(() => {
+    const storedContacts = localStorage.getItem('contacts');
     if (storedContacts) {
       let serializedContacts = JSON.parse(storedContacts);
 
-      this.setState({ contacts: serializedContacts });
+      setContacts(serializedContacts);
     }
-  }
+  }, []);
 
-  componentDidUpdate(
-    prevProps: Readonly<{}>,
-    prevState: Readonly<AppState>,
-    snapshot?: any
-  ) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-  checkForDuplicate = (name: string) => {
-    let { contacts } = this.state;
+  const checkForDuplicate = (name: string) => {
     let normalizedName = name.toLowerCase();
 
-    return contacts.some(contact =>
-      contact.name.toLowerCase().includes(normalizedName)
-    );
+    if (contacts) {
+      return contacts.some((contact: ContactType) =>
+        contact.name.toLowerCase().includes(normalizedName)
+      );
+    }
   };
 
-  onAddNewContact = (contact: ContactType) => {
-    const isDuplicate = this.checkForDuplicate(contact.name);
+  const onAddNewContact = (contact: ContactType) => {
+    const isDuplicate = checkForDuplicate(contact.name);
 
     if (isDuplicate) {
       alert(`${contact.name} is already in your contacts`);
     } else {
-      this.setState(current => ({
-        contacts: [...current.contacts, contact],
-      }));
+      setContacts((prevState: ContactType[]) => [...prevState, contact]);
     }
   };
 
-  onFilterChange = (filter: string) => {
-    this.setState({ filter });
+  const onFilterChange = (filter: string) => {
+    setFilter(filter);
   };
 
-  getFilteredContacts = () => {
-    let { contacts, filter } = this.state;
+  const getFilteredContacts = () => {
     let normalizedFilter = filter.toLowerCase();
 
     // filters by name or phone number
-    return contacts.filter(contact => {
+    return contacts.filter((contact: ContactType) => {
       return (
         contact.name.toLowerCase().includes(normalizedFilter) ||
         contact.phone.includes(normalizedFilter)
@@ -80,40 +67,27 @@ class App extends Component<{}, AppState> {
     });
   };
 
-  handleRemove = (id: string) => {
-    this.setState(current => ({
-      contacts: current.contacts.filter(contact => contact.id !== id),
-    }));
+  const handleRemove = (id: string) => {
+    let updatedContacts = contacts.filter(
+      (contact: ContactType) => contact.id !== id
+    );
+    setContacts(updatedContacts);
   };
 
-  render() {
-    const {
-      getFilteredContacts,
-      onFilterChange,
-      onAddNewContact,
-      handleRemove,
-    } = this;
-    const { contacts, filter } = this.state;
-    const contactsAreNotEmpty = contacts.length;
-    const filteredContacts = getFilteredContacts();
+  return (
+    <div className="App">
+      <Container>
+        <h1>Phonebook</h1>
+        <AddContactForm onAddNewContact={onAddNewContact} />
 
-    return (
-      <div className="App">
-        <Container>
-          <h1>Phonebook</h1>
-          <AddContactForm onAddNewContact={onAddNewContact} />
-
-          {contactsAreNotEmpty ? (
-            <>
-              <h2>Contacts</h2>
-              <FilterContacts filter={filter} onFilter={onFilterChange} />
-            </>
-          ) : null}
-          <ContactList contacts={filteredContacts} onRemove={handleRemove} />
-        </Container>
-      </div>
-    );
-  }
+        {contacts ? (
+          <>
+            <h2>Contacts</h2>
+            <FilterContacts filter={filter} onFilter={onFilterChange} />
+          </>
+        ) : null}
+        <ContactList contacts={getFilteredContacts()} onRemove={handleRemove} />
+      </Container>
+    </div>
+  );
 }
-
-export default App;
