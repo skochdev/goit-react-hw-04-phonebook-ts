@@ -1,0 +1,33 @@
+:root {
+  --default-bgc: #3f3f3f;
+  --default-hover-bgc: #85c44a;
+  --default-color: #4b3e3e;
+  --default-hover-color: #e8e8e8;
+  --icon-background-color: rgba(75, 62, 62, 0.25);
+  --icon-hover-background-color: rgba(37, 30, 30, 0.42);
+
+  /*Transitions*/
+  --default-transition-timing: cubic-bezier(0.1, 0.2, 0.3, 0.4);
+  --bgc-transition: background-color 250ms var(--default-transition-timing);
+  --color-transition: color 250ms var(--default-transition-timing);
+  --border-color-transition: border-color 250ms var(--default-transition-timing);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}

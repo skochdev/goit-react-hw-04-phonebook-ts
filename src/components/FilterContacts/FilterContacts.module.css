@@ -1,0 +1,12 @@
+.filterInput {
+  display: block;
+  border-radius: 100vw;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px 15px;
+  margin-bottom: 30px;
+  border: 1px solid var(--default-bgc);
+}
+
+.filterInput::placeholder {
+}
